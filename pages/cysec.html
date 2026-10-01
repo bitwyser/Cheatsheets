@@ -29,6 +29,7 @@
                     <li><a href="#governance">Governance Elements</a></li>
                     <li><a href="#risk">Risk Management</a></li>
                     <li><a href="#cia">CIA Triad</a></li>
+                    <li><a href="#iam">Identity &amp; Access Management</a></li>
                     <li><a href="#access-control">Access Control</a></li>
                     <li><a href="#cryptography">Cryptography</a></li>
                     <li><a href="#encryption">Encryption</a></li>
@@ -120,6 +121,268 @@
                 </div>
             </div>
 
+            <div class="sections" id="iam">
+                <h4 class="heading">Identity &amp; Access Management</h4>
+                <div class="content">
+                    <p>Identity and Access Management (IAM) is the set of policies and technologies an organization uses to make sure the right people and services get the right access to the right resources. Authentication, authorization, SSO, MFA, OAuth, OIDC, SAML, JWT, and RBAC are all pieces of the IAM ecosystem.</p>
+                    <div class="block-quote">Who are you? (Identity) → Can you prove it? (Authentication) → What are you allowed to do? (Authorization)</div>
+                    <ul>
+                        <li>
+                            <h6>Identity :</h6>
+                            <p>The digital representation of a user or entity: employees, customers, admins, and non-human identities such as service accounts, API keys, and devices. An identity carries attributes like a username (<code>rahul@company.com</code>), employee ID, profile details, and group or role memberships. Identities live in a directory or Identity Provider (IdP), such as Microsoft Entra ID (Azure AD), Okta, Google Workspace, Keycloak, or Active Directory.</p>
+                        </li>
+                        <li>
+                            <h6>Authentication (AuthN) :</h6>
+                            <p>Verifying that you really are the identity you claim to be, using passwords, OTPs, biometrics, hardware keys, or a trusted login provider ("Sign in with Google / Microsoft"). Authentication always comes first.</p>
+                        </li>
+                        <li>
+                            <h6>Authorization (AuthZ) :</h6>
+                            <p>Deciding what an authenticated identity is allowed to access and do. Permissions are assigned using an access control model such as RBAC or ABAC (see <a href="#access-control">Access Control</a>).</p>
+                        </li>
+                        <li>
+                            <h6>Accounting (Auditing) :</h6>
+                            <p>Recording who accessed what and when, for monitoring, investigations, and compliance. Together with AuthN and AuthZ, this forms the AAA model.</p>
+                        </li>
+                    </ul>
+                    <h6>Analogy: An Office Building -</h6>
+                    <div class="code-box code-box-color"><code>Authentication : "Show me your ID card."
+Authorization  : "Your card opens Floor 3, but not the server room."
+MFA            : "Show your ID card and enter the OTP sent to your phone."
+SSO            : "One office login works for HR, Jira, and email."
+RBAC           : "You're a Developer, so you get Developer permissions."
+Auditing       : "Every door logs each card swipe."</code></div>
+                    <h6>Authentication Factors -</h6>
+                    <ul class="justify">
+                        <li><b>Something You Know :</b> Password, PIN, security question.</li>
+                        <li><b>Something You Have :</b> Phone with an authenticator app, hardware security key (YubiKey), smart card.</li>
+                        <li><b>Something You Are :</b> Fingerprint, face, iris (biometrics).</li>
+                        <li><b>Context Signals :</b> Location, device, IP reputation, or typing behavior, used to adjust risk rather than as a standalone factor.</li>
+                    </ul>
+                    <h6>Types of Authentication -</h6>
+                    <ul class="justify">
+                        <li><b>Multi-Factor Authentication (MFA) :</b> Requires two or more factors from <i>different</i> categories. Password + OTP is MFA; password + security question is not (both are "something you know").</li>
+                        <li><b>One-Time Password (OTP) :</b> TOTP (time-based codes from apps like Google Authenticator, valid ~30 seconds), HOTP (counter-based), and SMS OTP (weakest, vulnerable to SIM swapping).</li>
+                        <li><b>Passwordless / Passkeys :</b> FIDO2 / WebAuthn credentials use a key pair stored on the device and unlocked with a fingerprint or PIN. The key is bound to the real website's domain, which makes passkeys phishing-resistant.</li>
+                        <li><b>Federated Login :</b> Authentication is delegated to a trusted external IdP ("Sign in with Google"), so the app never handles the password.</li>
+                        <li><b>Single Sign-On (SSO) :</b> Authenticate once and access many applications (details below).</li>
+                    </ul>
+                    <h6>Authorization Example -</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Resource</th>
+                                    <th>Permission</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>Employee</td>
+                                    <td>HR Portal</td>
+                                    <td>Read</td>
+                                </tr>
+                                <tr>
+                                    <td>Manager</td>
+                                    <td>HR Portal</td>
+                                    <td>Read + Write</td>
+                                </tr>
+                                <tr>
+                                    <td>Admin</td>
+                                    <td>HR Portal</td>
+                                    <td>Full Access</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Authentication vs Authorization -</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Authentication (AuthN)</th>
+                                    <th>Authorization (AuthZ)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>Question</td>
+                                    <td>Who are you?</td>
+                                    <td>What can you do?</td>
+                                </tr>
+                                <tr>
+                                    <td>Order</td>
+                                    <td>First</td>
+                                    <td>After authentication</td>
+                                </tr>
+                                <tr>
+                                    <td>Example</td>
+                                    <td>Password + OTP login</td>
+                                    <td>Manager can edit, employee can only read</td>
+                                </tr>
+                                <tr>
+                                    <td>HTTP Failure</td>
+                                    <td><code>401 Unauthorized</code></td>
+                                    <td><code>403 Forbidden</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Standards</td>
+                                    <td>OIDC, SAML, Kerberos</td>
+                                    <td>OAuth 2.0 (delegated access)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5>IAM Protocols &amp; Standards :</h5>
+                    <p>These terms are usually listed together, but they are different <i>kinds</i> of things: a concept, protocols, a framework, and a token format.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Term</th>
+                                    <th>Type</th>
+                                    <th>Purpose</th>
+                                    <th>Data Format</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>SSO</td>
+                                    <td>Concept</td>
+                                    <td>Log in once, access many apps</td>
+                                    <td>None (implemented with SAML or OIDC)</td>
+                                </tr>
+                                <tr>
+                                    <td>SAML 2.0</td>
+                                    <td>Authentication / federation protocol</td>
+                                    <td>Enterprise web SSO</td>
+                                    <td>XML assertions</td>
+                                </tr>
+                                <tr>
+                                    <td>OAuth 2.0</td>
+                                    <td>Authorization framework</td>
+                                    <td>Let an app access a resource on your behalf</td>
+                                    <td>Access tokens (any format)</td>
+                                </tr>
+                                <tr>
+                                    <td>OIDC</td>
+                                    <td>Authentication layer on OAuth 2.0</td>
+                                    <td>User login, "Sign in with Google"</td>
+                                    <td>ID token (always JWT)</td>
+                                </tr>
+                                <tr>
+                                    <td>JWT</td>
+                                    <td>Token format</td>
+                                    <td>Carry signed identity / authorization claims</td>
+                                    <td>Base64URL-encoded JSON</td>
+                                </tr>
+                                <tr>
+                                    <td>Kerberos</td>
+                                    <td>Network authentication protocol</td>
+                                    <td>SSO inside Windows / Active Directory domains</td>
+                                    <td>Encrypted tickets</td>
+                                </tr>
+                                <tr>
+                                    <td>LDAP</td>
+                                    <td>Directory access protocol</td>
+                                    <td>Look up and verify users in a directory</td>
+                                    <td>Directory entries</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5>Single Sign-On (SSO) :</h5>
+                    <p>SSO lets a user authenticate once with a central Identity Provider (IdP) and then access many applications (Service Providers) without logging in again. Apps trust the IdP instead of storing their own passwords, so MFA, password policy, and offboarding are managed in one place. The trade-off: the IdP becomes a high-value target, so it must be protected with strong MFA. SSO across organizations (e.g. logging in to a partner's portal with your company account) is called <b>federation</b>.</p>
+                    <div class="code-box code-box-color"><code>User logs in once at the IdP (Okta / Entra ID) with MFA
+   -&gt; Jira     (no login prompt)
+   -&gt; GitHub   (no login prompt)
+   -&gt; Email    (no login prompt)</code></div>
+                    <h5>SAML (Security Assertion Markup Language) :</h5>
+                    <p>SAML 2.0 is an XML-based open standard for exchanging authentication and authorization data between an Identity Provider and a Service Provider. It is the most common protocol behind enterprise SSO for web applications.</p>
+                    <ul class="justify">
+                        <li><b>Identity Provider (IdP) :</b> Authenticates the user and issues assertions (Okta, Entra ID, ADFS).</li>
+                        <li><b>Service Provider (SP) :</b> The application the user wants to access (Salesforce, Jira, AWS console).</li>
+                        <li><b>Assertion :</b> A digitally signed XML document stating who the user is, their attributes (email, groups), and how long the assertion is valid.</li>
+                    </ul>
+                    <h6>SAML Login Flow (SP-Initiated) -</h6>
+                    <div class="code-box code-box-color"><code>1. User opens the app (SP)       -&gt; not logged in
+2. SP redirects the browser to the IdP with a SAML AuthnRequest
+3. User logs in at the IdP (password + MFA)
+4. IdP sends a signed SAML Response (assertion) back to the SP through the browser
+5. SP verifies the signature, issuer, audience, and expiry -&gt; user is logged in</code></div>
+                    <h5>OAuth 2.0 :</h5>
+                    <p>OAuth 2.0 is an authorization framework that lets an application access a user's resources on another service <i>without</i> getting the user's password. The user approves specific permissions (scopes), and the app receives a limited, revocable access token. Example: a photo printing site gets read-only access to your Google Photos. OAuth is about access, not identity; for login, use OIDC on top of it.</p>
+                    <h6>Roles -</h6>
+                    <ul class="justify">
+                        <li><b>Resource Owner :</b> The user who owns the data.</li>
+                        <li><b>Client :</b> The application requesting access.</li>
+                        <li><b>Authorization Server :</b> Authenticates the user, gets consent, and issues tokens (Google, Okta, Auth0).</li>
+                        <li><b>Resource Server :</b> The API holding the data, which accepts the access token.</li>
+                    </ul>
+                    <h6>Key Terms -</h6>
+                    <ul class="justify">
+                        <li><b>Scope :</b> The specific permission requested, such as <code>photos.read</code> or <code>repo</code>.</li>
+                        <li><b>Access Token :</b> Short-lived credential sent to the API as <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+                        <li><b>Refresh Token :</b> Longer-lived credential used to get new access tokens without asking the user again.</li>
+                        <li><b>Redirect URI :</b> The pre-registered URL where the authorization server sends the user back.</li>
+                        <li><b>State :</b> A random value sent and checked on return to prevent CSRF on the login flow.</li>
+                    </ul>
+                    <h6>Grant Types (Flows) -</h6>
+                    <ul class="justify">
+                        <li><b>Authorization Code + PKCE :</b> The recommended flow for web, mobile, and single-page apps. PKCE (Proof Key for Code Exchange) ensures a stolen authorization code cannot be redeemed by an attacker.</li>
+                        <li><b>Client Credentials :</b> Machine-to-machine access with no user involved, such as a backend service calling another API.</li>
+                        <li><b>Device Code :</b> For devices with limited input, such as a smart TV showing "Go to example.com/device and enter code ABCD-1234".</li>
+                        <li><b>Refresh Token :</b> Exchanges a refresh token for a new access token.</li>
+                        <li><b>Implicit &amp; Password Grants :</b> Deprecated. Implicit exposes tokens in the URL; the password grant hands the user's password to the app.</li>
+                    </ul>
+                    <h6>Authorization Code Flow with PKCE -</h6>
+                    <div class="code-box code-box-color"><code>1. App  -&gt; Auth Server : redirect user to /authorize?client_id=app&amp;scope=photos.read
+                          &amp;code_challenge=HASH&amp;state=xyz&amp;redirect_uri=https://app.com/cb
+2. User logs in and clicks "Allow"
+3. Auth Server -&gt; App  : redirect to https://app.com/cb?code=AUTH_CODE&amp;state=xyz
+4. App  -&gt; Auth Server : POST /token (code + code_verifier) -&gt; access_token, refresh_token
+5. App  -&gt; API         : GET /photos   Authorization: Bearer &lt;access_token&gt;</code></div>
+                    <h5>OpenID Connect (OIDC) :</h5>
+                    <p>OIDC is an identity layer built on top of OAuth 2.0 that adds authentication. The app requests the <code>openid</code> scope and, along with the access token, receives an <b>ID Token</b>: a JWT describing who the user is. OIDC powers "Sign in with Google / Microsoft / Apple" and most modern SSO. Providers publish their configuration at <code>/.well-known/openid-configuration</code>.</p>
+                    <div class="code-box code-box-color"><code>// Decoded ID token payload
+{
+  "iss": "https://accounts.google.com",   // issuer
+  "sub": "110169484474386276334",         // unique user ID
+  "aud": "my-app-client-id",              // intended app
+  "email": "rahul@company.com",
+  "iat": 1767225600,                      // issued at
+  "exp": 1767229200                       // expires (1 hour later)
+}</code></div>
+                    <div class="block-quote"><b>OAuth 2.0 vs OIDC :</b> OAuth answers "what can this app access?" with an access token meant for the API. OIDC answers "who is this user?" with an ID token meant for the app. Never treat an OAuth access token as proof of login.</div>
+                    <h5>JSON Web Token (JWT) :</h5>
+                    <p>JWT (pronounced "jot") is a compact, URL-safe token format for carrying claims between parties. It has three Base64URL-encoded parts separated by dots: <code>header.payload.signature</code>. The signature lets the receiver detect tampering, but a standard JWT is <i>not encrypted</i>: anyone can decode and read the payload, so never put passwords or secrets in it. JWTs are used as OIDC ID tokens, often as OAuth access tokens, and for stateless API sessions.</p>
+                    <div class="code-box code-box-color"><code>Header    : {"alg": "HS256", "typ": "JWT"}
+Payload   : {"sub": "1234567890", "name": "John Doe", "iat": 1516239022}
+Signature : HMACSHA256(base64url(header) + "." + base64url(payload), secret)
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></div>
+                    <ul class="justify">
+                        <li><b>Registered Claims :</b> <code>iss</code> (issuer), <code>sub</code> (subject / user), <code>aud</code> (audience), <code>exp</code> (expiry), <code>iat</code> (issued at), <code>nbf</code> (not before), <code>jti</code> (unique token ID).</li>
+                        <li><b>Symmetric Signing (HS256) :</b> One shared secret both signs and verifies. Simple, but every verifier can also forge tokens.</li>
+                        <li><b>Asymmetric Signing (RS256 / ES256) :</b> A private key signs and a public key verifies. Preferred when many services verify tokens from one issuer.</li>
+                        <li><b>Stateless Trade-off :</b> The server does not store sessions, but a JWT cannot easily be revoked before it expires. Keep access tokens short-lived and use refresh tokens.</li>
+                    </ul>
+                    <h6>Common IAM Weaknesses (Pentesting) -</h6>
+                    <ul class="justify">
+                        <li><b>JWT "alg": "none" / No Verification :</b> The server accepts unsigned or modified tokens, letting an attacker change <code>"role": "user"</code> to <code>"admin"</code>.</li>
+                        <li><b>JWT Algorithm Confusion :</b> The server expects RS256 but accepts HS256, so the attacker signs a token using the server's <i>public</i> key as the HMAC secret.</li>
+                        <li><b>Weak JWT Secret :</b> HS256 secrets like <code>secret123</code> can be brute-forced offline from a single captured token.</li>
+                        <li><b>No Expiry / Revocation :</b> Long-lived tokens remain valid after logout or password change.</li>
+                        <li><b>OAuth Redirect URI Manipulation :</b> Loose redirect URI matching lets an attacker receive the authorization code or token. Require an exact match.</li>
+                        <li><b>Missing State / PKCE :</b> Enables login CSRF and authorization code interception.</li>
+                        <li><b>SAML Signature Wrapping (XSW) :</b> The attacker injects a forged assertion while keeping the original signed element, and a poorly written SP validates one but reads the other.</li>
+                        <li><b>MFA Bypass :</b> Push fatigue (spamming approval prompts), SIM swapping for SMS OTP, or skipping the MFA step by browsing directly to a post-login page.</li>
+                        <li><b>Missing Authorization Checks :</b> Logged-in users can access other users' data (IDOR). See Broken Access Control in <a href="#vulns">Vulnerabilities</a>.</li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="sections" id="access-control">
                 <h4 class="heading">Access Control</h4>
                 <div class="content">
@@ -136,11 +399,15 @@
                         </li>
                         <li>
                             <h6>Role-Based Access Control (RBAC) :</h6>
-                            <p>Access rights are assigned based on roles within an organization, rather than individual users. Users are granted permissions according to the role they are assigned (e.g., admin, manager, employee). Individuals can perform any action that is assigned to their role and may be assigned multiple roles as necessary. Example: An admin has full access, while regular users may have read-only access to certain files.</p>
+                            <p>Access rights are assigned based on roles within an organization, rather than individual users. Users are granted permissions according to the role they are assigned (e.g., admin, manager, employee). Individuals can perform any action that is assigned to their role and may be assigned multiple roles as necessary. Example: The Developer role grants GitHub, Jira, and the dev server; the HR role grants the employee portal and payroll; an admin has full access.</p>
                         </li>
                         <li>
                             <h6>Rule-Based Access Control :</h6>
                             <p>A set of rules is established to determine access; these rules are based on specific conditions (e.g., network location, device, or specific times of day). RuBAC is an extension of RBAC in which access is governed by a set of rules that the organization prescribes. Example: Allowing access to certain systems only when a user is connected from the company's secure network.</p>
+                        </li>
+                        <li>
+                            <h6>Attribute-Based Access Control (ABAC) :</h6>
+                            <p>Access decisions evaluate attributes of the user (department, clearance), the resource (owner, sensitivity), the action (read, approve), and the environment (time, location, device). More fine-grained than RBAC, since one policy can replace many roles. Example: "Finance managers can approve invoices under $10,000 during business hours from a company-managed device." AWS IAM policies with conditions and tags are a common implementation.</p>
                         </li>
                     </ul>
                     <h5>Microsegmentation :</h5>
@@ -204,7 +471,7 @@
                 </div>
             </div>
 
-            <div class="sections" id="Hash">
+            <div class="sections" id="hash">
                 <h4 class="heading">Hashing</h4>
                 <div class="content">
                     <p>Hashing is a method of converting data (message, file, or password) into a fixed-size string of characters, which typically represents a "fingerprint" of the original data. This converted hash value is called digest. Hashes are used for data integrity checks, ensuring that data has not been altered. Hashing is often used in file fingerprinting and storing passwords securely. Instead of storing the password itself, systems store the hash of the password.</p>
@@ -435,7 +702,7 @@
                     <h5>Broken Access Control (BAC) :</h5>
                     <p>Broken Access Control is a security vulnerability that occurs when an application fails to properly enforce restrictions on what authenticated users are allowed to do, enabling attackers to gain unauthorized access to resources or perform actions outside their intended permissions. Access control defines who can perform specific actions within an application. When these rules are poorly implemented or entirely missing, it can allow malicious users to access other users' data, perform admin-level actions without proper authorization, or modify and delete records they should not have access to. Examples of Broken Access Control include Insecure Direct Object References (IDOR), where attackers modify user IDs in URLs to access unauthorized accounts; missing role checks that let regular users access admin functions; forced browsing to hidden, privileged endpoints; and relying on frontend restrictions without backend enforcement, allowing attackers to send unauthorized requests manually.</p>
                     <h5>Broken Authentication :</h5>
-                    <p>Broken Authentication is a security vulnerability where an application’s authentication mechanisms are improperly implemented, allowing attackers to compromise user accounts, bypass authentication, or impersonate other users. Common causes include weak, predictable, or default passwords; poor session management (e.g., session IDs not rotated or invalidated on logout); credential stuffing attacks due to reused passwords; insecure password recovery or reset processes; exposing authentication tokens in URLs or logs; and failure to enforce multi-factor authentication (MFA) where appropriate. Consequences of broken authentication can include account takeover, data theft or unauthorized access, privilege escalation if administrative accounts are compromised, and fraud or identity theft.</p>
+                    <p>Broken Authentication is a security vulnerability where an application’s authentication mechanisms are improperly implemented, allowing attackers to compromise user accounts, bypass authentication, or impersonate other users. Common causes include weak, predictable, or default passwords; poor session management (e.g., session IDs not rotated or invalidated on logout); credential stuffing attacks due to reused passwords; insecure password recovery or reset processes; exposing authentication tokens in URLs or logs; weak JWT validation or misconfigured OAuth / SAML flows (see <a href="#iam">IAM</a>); and failure to enforce multi-factor authentication (MFA) where appropriate. Consequences of broken authentication can include account takeover, data theft or unauthorized access, privilege escalation if administrative accounts are compromised, and fraud or identity theft.</p>
                     <h5>Sensitive Data Exposure :</h5>
                     <p>Sensitive Data Exposure is a security vulnerability that occurs when an application inadvertently exposes confidential or personal information to unauthorized parties. This can happen through weak encryption, improper handling, or insecure transmission and storage of sensitive data such as passwords, credit card numbers, personal identification details, or health records. When sensitive data is exposed, attackers can steal or manipulate it, leading to identity theft, financial loss, or privacy violations. Protecting sensitive data requires strong encryption, secure transmission protocols (like HTTPS), proper access controls, and careful data handling practices throughout the application lifecycle.</p>
                     <h5>Security Misconfiguration :</h5>
