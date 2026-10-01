@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>PowerShell Cheatsheet</title>
+
+        <!-- Bootstrap CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="../assets/css/style.css">
+    </head>
+
+    <body data-theme="dark">
+        <div class="container">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <a href="/Cheatsheets" class="back-link"><i class="bi bi-grid-3x3-gap-fill"></i> All Cheatsheets</a>
+                <div class="button"><i class="bi bi-circle-half"></i></div>
+            </div>
+
+            <h3 class="title">PowerShell</h3>
+
+            <div class="section-list">
+                <ul>
+                    <li><a href="#powershell">PowerShell</a></li>
+                    <li><a href="#help">Getting Help</a></li>
+                    <li><a href="#cmdlets">Cmdlets &amp; Syntax</a></li>
+                    <li><a href="#pipeline">Pipeline &amp; Objects</a></li>
+                    <li><a href="#variables">Variables &amp; Data Types</a></li>
+                    <li><a href="#operators">Operators</a></li>
+                    <li><a href="#control-flow">Control Flow</a></li>
+                    <li><a href="#functions">Functions, Scripts &amp; Modules</a></li>
+                    <li><a href="#filesystem">File System</a></li>
+                    <li><a href="#system">Processes, Services &amp; System</a></li>
+                    <li><a href="#networking">Networking &amp; Web</a></li>
+                    <li><a href="#errors">Error Handling &amp; Streams</a></li>
+                    <li><a href="#remoting">Remoting &amp; Jobs</a></li>
+                    <li><a href="#security">Execution Policy &amp; Security</a></li>
+                    <li><a href="#bash-vs-ps">Bash vs PowerShell</a></li>
+                </ul>
+            </div>
+
+            <div class="sections" id="powershell">
+                <h4 class="heading">PowerShell</h4>
+                <div class="content">
+                    <p>PowerShell is a cross-platform command-line shell and scripting language from Microsoft, first released in 2006. Unlike traditional shells such as Bash or CMD, which pass plain text between commands, PowerShell passes <b>.NET objects</b> with properties and methods. This makes it a powerful tool for system administration and automation on Windows, Linux, and macOS, and the main management interface for Windows Server, Active Directory, Azure, and Microsoft 365.</p>
+                    <h6>Key Features -</h6>
+                    <ul class="justify">
+                        <li><b>Object-Based Pipeline :</b> Commands output structured objects, so you filter and sort by property (<code>Status</code>, <code>CPU</code>) instead of parsing text with tools like <code>grep</code> and <code>awk</code>.</li>
+                        <li><b>Consistent Verb-Noun Commands :</b> Commands (cmdlets) follow a predictable naming pattern like <code>Get-Process</code> and <code>Stop-Service</code>, so they are easy to discover and guess.</li>
+                        <li><b>Full Scripting Language :</b> Variables, functions, loops, error handling, classes, and modules.</li>
+                        <li><b>.NET Access :</b> Any .NET class can be used directly, e.g. <code>[System.IO.Path]::GetTempPath()</code>.</li>
+                        <li><b>Providers :</b> The registry, environment variables, and certificate store can be browsed like drives (<code>HKLM:</code>, <code>Env:</code>, <code>Cert:</code>).</li>
+                        <li><b>Remoting :</b> Run commands on one or many remote machines over WinRM or SSH.</li>
+                    </ul>
+                    <h6>Editions -</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Windows PowerShell 5.1</th>
+                                    <th>PowerShell 7+</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>Executable</td>
+                                    <td><code>powershell.exe</code></td>
+                                    <td><code>pwsh</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Runtime</td>
+                                    <td>.NET Framework</td>
+                                    <td>Modern .NET</td>
+                                </tr>
+                                <tr>
+                                    <td>Platforms</td>
+                                    <td>Windows only</td>
+                                    <td>Windows, Linux, macOS</td>
+                                </tr>
+                                <tr>
+                                    <td>Status</td>
+                                    <td>Built into Windows, maintenance only</td>
+                                    <td>Open source, actively developed</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>Both can be installed side by side. Use PowerShell 7 for new work; some older Windows-only modules still need 5.1.</p>
+                    <div class="code-box code-box-color"><code>$PSVersionTable                    # show PowerShell version and edition
+winget install Microsoft.PowerShell  # install PowerShell 7 on Windows</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="help">
+                <h4 class="heading">Getting Help</h4>
+                <div class="content">
+                    <p>PowerShell is designed to be self-documenting. Three commands let you discover almost anything: <code>Get-Command</code> finds commands, <code>Get-Help</code> explains them, and <code>Get-Member</code> shows what an object contains.</p>
+                    <div class="code-box code-box-color"><code>Get-Command *service*              # find commands by name
+Get-Command -Verb Get -Noun *Net*  # find by verb and noun
+Get-Help Get-Process               # short help for a command
+Get-Help Get-Process -Examples     # usage examples only
+Get-Help Get-Process -Online       # open full docs in the browser
+Update-Help                        # download the latest help files
+Get-Process | Get-Member           # list an object's properties and methods
+Get-Alias ls                       # what command is 'ls' an alias for?
+Get-Alias -Definition Get-ChildItem  # all aliases of a command
+Get-History                        # commands run in this session</code></div>
+                    <ul class="justify">
+                        <li><b>Tab Completion :</b> Press <kbd>Tab</kbd> to complete command names, parameters, paths, and even property names.</li>
+                        <li><b>PSReadLine :</b> Built-in line editor with history search (<kbd>Ctrl</kbd> + <kbd>R</kbd>) and predictive suggestions from your history.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="cmdlets">
+                <h4 class="heading">Cmdlets &amp; Syntax</h4>
+                <div class="content">
+                    <p>A cmdlet (pronounced "command-let") is a lightweight built-in command named in <code>Verb-Noun</code> form. The verb says what action is performed and the noun says what it acts on. Commands are case-insensitive.</p>
+                    <div class="code-box code-box-color"><code>Verb-Noun -ParameterName Value -SwitchParameter
+Get-ChildItem -Path C:\Logs -Filter *.log -Recurse</code></div>
+                    <h6>Common Approved Verbs -</h6>
+                    <ul class="justify">
+                        <li><b>Get / Set :</b> Read or change something (<code>Get-Date</code>, <code>Set-Location</code>).</li>
+                        <li><b>New / Remove :</b> Create or delete (<code>New-Item</code>, <code>Remove-Item</code>).</li>
+                        <li><b>Start / Stop / Restart :</b> Control processes and services (<code>Start-Service</code>).</li>
+                        <li><b>Add / Clear :</b> Append to or empty something (<code>Add-Content</code>, <code>Clear-Host</code>).</li>
+                        <li><b>Import / Export / ConvertTo / ConvertFrom :</b> Move data in and out of formats (<code>Export-Csv</code>, <code>ConvertTo-Json</code>).</li>
+                        <li><b>Invoke / Test :</b> Run something or check a condition (<code>Invoke-Command</code>, <code>Test-Path</code>).</li>
+                    </ul>
+                    <p>Run <code>Get-Verb</code> to see the full list of approved verbs.</p>
+                    <h6>Types of Parameters -</h6>
+                    <ul class="justify">
+                        <li><b>Named :</b> Passed by name, in any order: <code>Get-Process -Name chrome</code>.</li>
+                        <li><b>Positional :</b> The name can be omitted for some parameters: <code>Get-Process chrome</code>.</li>
+                        <li><b>Switch :</b> A flag with no value, on when present: <code>-Recurse</code>, <code>-Force</code>.</li>
+                        <li><b>Abbreviated :</b> Parameter names can be shortened while still unique: <code>-Rec</code> for <code>-Recurse</code> (avoid in scripts).</li>
+                    </ul>
+                    <h6>Common Parameters (Work on Most Cmdlets) -</h6>
+                    <ul class="justify">
+                        <li><b>-WhatIf :</b> Shows what would happen without doing it. Use before any destructive command.</li>
+                        <li><b>-Confirm :</b> Asks for confirmation before each change.</li>
+                        <li><b>-Verbose / -Debug :</b> Show extra detail about what the command is doing.</li>
+                        <li><b>-ErrorAction :</b> Controls what happens on an error (<code>Stop</code>, <code>Continue</code>, <code>SilentlyContinue</code>).</li>
+                        <li><b>-OutVariable :</b> Saves the output to a variable while still passing it on.</li>
+                    </ul>
+                    <div class="code-box code-box-color"><code>Remove-Item C:\Temp\*.tmp -WhatIf
+# What if: Performing the operation "Remove File" on target "C:\Temp\a.tmp".</code></div>
+                    <h6>Syntax Rules -</h6>
+                    <ul class="justify">
+                        <li><b>Comments :</b> <code># single line</code> and <code>&lt;# multi-line #&gt;</code>.</li>
+                        <li><b>Line Continuation :</b> Lines can break after a pipe <code>|</code>, comma, or opening bracket. A backtick <code>`</code> also continues a line but is fragile; prefer splatting (see <a href="#functions">Functions</a>).</li>
+                        <li><b>Escape Character :</b> The backtick: <code>`n</code> (newline), <code>`t</code> (tab), <code>`"</code> (quote).</li>
+                        <li><b>Multiple Statements :</b> Separate with a semicolon: <code>cd C:\; ls</code>.</li>
+                        <li><b>Call Operator <code>&amp;</code> :</b> Runs a command stored in a string or a path with spaces: <code>&amp; "C:\Program Files\App\app.exe" --help</code>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="pipeline">
+                <h4 class="heading">Pipeline &amp; Objects</h4>
+                <div class="content">
+                    <p>The pipeline <code>|</code> sends the output of one command as input to the next. Because objects flow through it, not text, every command downstream can work with named properties directly. Inside script blocks, <code>$_</code> (or <code>$PSItem</code>) refers to the current object.</p>
+                    <div class="code-box code-box-color"><code># Top 5 processes by CPU time, showing only name, ID, and CPU
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 Name, Id, CPU
+
+# Running services whose name starts with "Win"
+Get-Service | Where-Object { $_.Status -eq 'Running' -and $_.Name -like 'Win*' }</code></div>
+                    <h6>Core Pipeline Cmdlets -</h6>
+                    <ul class="justify">
+                        <li><b>Where-Object (<code>where</code>, <code>?</code>) :</b> Filters objects. Simplified form: <code>Where-Object Status -eq 'Running'</code>.</li>
+                        <li><b>Select-Object (<code>select</code>) :</b> Picks properties or items: <code>-First</code>, <code>-Last</code>, <code>-Unique</code>, <code>-ExpandProperty</code>.</li>
+                        <li><b>Sort-Object (<code>sort</code>) :</b> Sorts by one or more properties: <code>Sort-Object Length -Descending</code>.</li>
+                        <li><b>ForEach-Object (<code>foreach</code>, <code>%</code>) :</b> Runs a script block for each object: <code>ForEach-Object { $_.Name.ToUpper() }</code>.</li>
+                        <li><b>Group-Object (<code>group</code>) :</b> Groups objects by a property and counts them.</li>
+                        <li><b>Measure-Object (<code>measure</code>) :</b> Count, sum, average, min, max: <code>Measure-Object Length -Sum -Average</code>.</li>
+                        <li><b>Tee-Object (<code>tee</code>) :</b> Saves output to a file or variable and passes it on.</li>
+                    </ul>
+                    <h6>Formatting &amp; Output -</h6>
+                    <ul class="justify">
+                        <li><b>Format-Table (<code>ft</code>) / Format-List (<code>fl</code>) :</b> Display as a table or a property list. <code>Format-List *</code> shows every property.</li>
+                        <li><b>Out-File / Out-GridView :</b> Write to a file, or show an interactive filterable window (Windows).</li>
+                        <li><b>Export-Csv / Import-Csv :</b> Save and load objects as CSV.</li>
+                        <li><b>ConvertTo-Json / ConvertFrom-Json :</b> Convert objects to and from JSON.</li>
+                    </ul>
+                    <div class="block-quote">Always use <code>Format-*</code> cmdlets last in a pipeline. They turn objects into display formatting, so nothing useful can follow them.</div>
+                    <h6>Calculated Properties -</h6>
+                    <div class="code-box code-box-color"><code># 10 largest files with their size in MB
+Get-ChildItem -Recurse -File |
+    Sort-Object Length -Descending |
+    Select-Object -First 10 Name, @{ Name = 'SizeMB'; Expression = { [math]::Round($_.Length / 1MB, 2) } }</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="variables">
+                <h4 class="heading">Variables &amp; Data Types</h4>
+                <div class="content">
+                    <p>Variables start with <code>$</code>, are case-insensitive, and do not need to be declared. Their type is inferred, but you can enforce one with a type cast.</p>
+                    <div class="code-box code-box-color"><code>$name = "Rahul"
+$count = 42
+[int]$port = "8080"        # type constraint: the string is converted to an int
+$port = "abc"              # error: cannot convert "abc" to int
+$a, $b = 1, 2              # multiple assignment
+$a, $b = $b, $a            # swap
+Remove-Variable name       # delete a variable</code></div>
+                    <h6>Common Types -</h6>
+                    <ul class="justify">
+                        <li><b>Primitives :</b> <code>[string]</code>, <code>[int]</code>, <code>[long]</code>, <code>[double]</code>, <code>[decimal]</code>, <code>[bool]</code>, <code>[char]</code>.</li>
+                        <li><b>Others :</b> <code>[datetime]</code>, <code>[array]</code>, <code>[hashtable]</code>, <code>[xml]</code>, <code>[regex]</code>, <code>[pscustomobject]</code>.</li>
+                        <li><b>Type Check :</b> <code>$x.GetType().Name</code> or <code>$x -is [int]</code>.</li>
+                        <li><b>Size Suffixes :</b> <code>1KB</code>, <code>1MB</code>, <code>1GB</code> are numeric literals (<code>1MB</code> = 1048576).</li>
+                    </ul>
+                    <h5>Strings :</h5>
+                    <div class="code-box code-box-color"><code>$name = "World"
+"Hello $name"                  # double quotes expand variables: Hello World
+'Hello $name'                  # single quotes are literal:      Hello $name
+"Total: $(2 + 3)"              # subexpression $( ):              Total: 5
+"{0} has {1} items" -f "Cart", 3   # format operator
+
+$text = @"
+Multi-line here-string.
+Variables like $name still expand.
+"@                             # closing "@ must start the line
+
+"PowerShell".Length            # 10
+"PowerShell".ToUpper()         # POWERSHELL
+"a,b,c" -split ","             # array: a b c
+@("a","b","c") -join "-"       # a-b-c
+"Hello World".Replace("World", "PS")</code></div>
+                    <h5>Arrays :</h5>
+                    <div class="code-box code-box-color"><code>$nums = @(10, 20, 30)
+$nums = 1..5                   # range: 1 2 3 4 5
+$nums[0]                       # first element
+$nums[-1]                      # last element
+$nums[1..3]                    # slice
+$nums.Count                    # length
+$nums += 6                     # append (creates a new array)
+$list = [System.Collections.Generic.List[int]]::new()
+$list.Add(7)                   # efficient growable list for large loops</code></div>
+                    <h5>Hashtables :</h5>
+                    <div class="code-box code-box-color"><code>$user = @{ Name = "Rahul"; Role = "Admin"; Age = 30 }
+$user.Name                     # Rahul
+$user["Role"]                  # Admin
+$user.City = "Pune"            # add a key
+$user.Remove("Age")
+$user.Keys; $user.Values
+$user.ContainsKey("Name")      # True
+$ordered = [ordered]@{ First = 1; Second = 2 }   # keeps insertion order</code></div>
+                    <h5>Custom Objects :</h5>
+                    <div class="code-box code-box-color"><code>$server = [PSCustomObject]@{
+    Name   = "web01"
+    IP     = "10.0.0.5"
+    Online = $true
+}
+$server.Name
+$server | Export-Csv servers.csv -NoTypeInformation</code></div>
+                    <h6>Automatic Variables -</h6>
+                    <ul class="justify">
+                        <li><b><code>$_</code> / <code>$PSItem</code> :</b> The current object in the pipeline.</li>
+                        <li><b><code>$true</code>, <code>$false</code>, <code>$null</code> :</b> Boolean and null values.</li>
+                        <li><b><code>$?</code> :</b> <code>True</code> if the last command succeeded.</li>
+                        <li><b><code>$LASTEXITCODE</code> :</b> Exit code of the last native program (e.g. <code>git</code>, <code>ping</code>).</li>
+                        <li><b><code>$Error</code> :</b> List of recent errors; <code>$Error[0]</code> is the latest.</li>
+                        <li><b><code>$args</code> :</b> Arguments passed to a script or function without declared parameters.</li>
+                        <li><b><code>$PSScriptRoot</code> :</b> Folder of the running script, useful for relative paths.</li>
+                        <li><b><code>$HOME</code>, <code>$PWD</code>, <code>$PID</code> :</b> Home folder, current location, current process ID.</li>
+                        <li><b><code>$env:NAME</code> :</b> Environment variables, e.g. <code>$env:PATH</code>, <code>$env:USERNAME</code>. Set with <code>$env:API_URL = "https://..."</code> (current session only).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="operators">
+                <h4 class="heading">Operators</h4>
+                <div class="content">
+                    <p>PowerShell uses word-style operators that start with a dash. Symbols like <code>&gt;</code> and <code>&lt;</code> are reserved for redirection, so <code>5 &gt; 3</code> creates a file named <code>3</code>; use <code>5 -gt 3</code> instead.</p>
+                    <h6>Comparison Operators -</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Operator</th>
+                                    <th>Meaning</th>
+                                    <th>Example (Result)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td><code>-eq</code> / <code>-ne</code></td>
+                                    <td>Equal / not equal</td>
+                                    <td><code>5 -eq 5</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-gt</code> / <code>-ge</code></td>
+                                    <td>Greater than / or equal</td>
+                                    <td><code>10 -gt 3</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-lt</code> / <code>-le</code></td>
+                                    <td>Less than / or equal</td>
+                                    <td><code>2 -le 2</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-like</code> / <code>-notlike</code></td>
+                                    <td>Wildcard match (<code>*</code>, <code>?</code>)</td>
+                                    <td><code>"report.pdf" -like "*.pdf"</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-match</code> / <code>-notmatch</code></td>
+                                    <td>Regex match (fills <code>$Matches</code>)</td>
+                                    <td><code>"v7.4" -match "\d+\.\d+"</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-contains</code> / <code>-notcontains</code></td>
+                                    <td>Collection contains value</td>
+                                    <td><code>@(1,2,3) -contains 2</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-in</code> / <code>-notin</code></td>
+                                    <td>Value is in collection</td>
+                                    <td><code>2 -in @(1,2,3)</code> (True)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-replace</code></td>
+                                    <td>Regex replace</td>
+                                    <td><code>"a-b" -replace "-", "_"</code> (a_b)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>-is</code> / <code>-as</code></td>
+                                    <td>Type check / type conversion</td>
+                                    <td><code>"5" -as [int]</code> (5)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>String comparisons are case-insensitive by default. Prefix with <code>c</code> for case-sensitive (<code>-ceq</code>, <code>-clike</code>, <code>-cmatch</code>).</p>
+                    <h6>Other Operators -</h6>
+                    <ul class="justify">
+                        <li><b>Arithmetic :</b> <code>+ - * / %</code>. <code>+</code> also joins strings and arrays.</li>
+                        <li><b>Assignment :</b> <code>= += -= *= /= %= ++ --</code>.</li>
+                        <li><b>Logical :</b> <code>-and</code>, <code>-or</code>, <code>-xor</code>, <code>-not</code> (or <code>!</code>).</li>
+                        <li><b>Split &amp; Join :</b> <code>"a b c" -split " "</code>, <code>$arr -join ","</code>.</li>
+                        <li><b>Range :</b> <code>1..10</code>.</li>
+                        <li><b>Ternary (PS 7+) :</b> <code>$status = $age -ge 18 ? "Adult" : "Minor"</code>.</li>
+                        <li><b>Null-Coalescing (PS 7+) :</b> <code>$name ?? "Guest"</code> uses the right side if the left is <code>$null</code>; <code>$x ??= 10</code> assigns only if null.</li>
+                        <li><b>Pipeline Chain (PS 7+) :</b> <code>cmd1 &amp;&amp; cmd2</code> runs cmd2 only if cmd1 succeeded; <code>cmd1 || cmd2</code> only if it failed.</li>
+                    </ul>
+                    <h6>Redirection -</h6>
+                    <div class="code-box code-box-color"><code>Get-Process &gt; procs.txt        # write output to a file (overwrite)
+Get-Process &gt;&gt; procs.txt       # append
+cmd 2&gt; errors.txt              # redirect errors only
+cmd 2&gt;&amp;1                       # merge errors into normal output
+cmd *&gt; all.txt                 # redirect all streams
+cmd &gt; $null                    # discard output</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="control-flow">
+                <h4 class="heading">Control Flow</h4>
+                <div class="content">
+                    <h5>If / ElseIf / Else :</h5>
+                    <div class="code-box code-box-color"><code>$disk = Get-PSDrive C
+$freeGB = $disk.Free / 1GB
+
+if ($freeGB -lt 10) {
+    Write-Warning "Low disk space: $([math]::Round($freeGB)) GB"
+} elseif ($freeGB -lt 50) {
+    Write-Host "Disk space OK"
+} else {
+    Write-Host "Plenty of space"
+}</code></div>
+                    <h5>Switch :</h5>
+                    <div class="code-box code-box-color"><code>switch ((Get-Date).DayOfWeek) {
+    "Saturday" { "Weekend" }
+    "Sunday"   { "Weekend" }
+    default    { "Weekday" }
+}
+
+switch -Wildcard ($file) {     # also -Regex, -CaseSensitive
+    "*.log" { "Log file" }
+    "*.csv" { "Data file" }
+}</code></div>
+                    <h5>Loops :</h5>
+                    <div class="code-box code-box-color"><code>foreach ($svc in Get-Service) {          # foreach statement
+    if ($svc.Status -eq 'Stopped') { continue }
+    $svc.Name
+}
+
+for ($i = 0; $i -lt 5; $i++) { "Count $i" }
+
+$retries = 0
+while ($retries -lt 3) { $retries++ }
+
+do { $answer = Read-Host "Continue? (y/n)" } until ($answer -in 'y', 'n')
+
+1..10 | ForEach-Object { $_ * 2 }        # pipeline version
+
+# PS 7+: run iterations in parallel threads
+$servers | ForEach-Object -Parallel { Test-Connection $_ -Count 1 } -ThrottleLimit 5</code></div>
+                    <ul class="justify">
+                        <li><b>break / continue :</b> Exit the loop, or skip to the next iteration.</li>
+                        <li><b>foreach vs ForEach-Object :</b> The <code>foreach</code> statement loads the whole collection first and is faster; <code>ForEach-Object</code> streams items one at a time through the pipeline and uses less memory for large data.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="functions">
+                <h4 class="heading">Functions, Scripts &amp; Modules</h4>
+                <div class="content">
+                    <h5>Functions :</h5>
+                    <div class="code-box code-box-color"><code>function Get-Greeting {
+    param(
+        [string]$Name = "World"
+    )
+    "Hello, $Name!"
+}
+
+Get-Greeting                   # Hello, World!
+Get-Greeting -Name "Rahul"     # Hello, Rahul!</code></div>
+                    <div class="block-quote">A function returns <i>everything</i> it outputs, not just the value after <code>return</code>. Any uncaptured expression ends up in the result. Discard unwanted output with <code>$null = ...</code> or <code>| Out-Null</code>.</div>
+                    <h6>Advanced Functions -</h6>
+                    <p>Adding <code>[CmdletBinding()]</code> makes a function behave like a real cmdlet: it gains common parameters (<code>-Verbose</code>, <code>-ErrorAction</code>), and with <code>SupportsShouldProcess</code> it supports <code>-WhatIf</code> and <code>-Confirm</code>.</p>
+                    <div class="code-box code-box-color"><code>function Remove-OldLogs {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateScript({ Test-Path $_ })]
+        [string]$Path,
+
+        [ValidateRange(1, 365)]
+        [int]$Days = 30
+    )
+
+    $cutoff = (Get-Date).AddDays(-$Days)
+    Get-ChildItem $Path -Filter *.log |
+        Where-Object LastWriteTime -lt $cutoff |
+        ForEach-Object {
+            if ($PSCmdlet.ShouldProcess($_.Name, "Delete")) {
+                Remove-Item $_.FullName
+                Write-Verbose "Deleted $($_.Name)"
+            }
+        }
+}
+
+Remove-OldLogs -Path C:\Logs -Days 7 -WhatIf -Verbose</code></div>
+                    <h6>Parameter Attributes -</h6>
+                    <ul class="justify">
+                        <li><b>[Parameter(Mandatory)] :</b> PowerShell prompts for the value if it is not given.</li>
+                        <li><b>[Parameter(ValueFromPipeline)] :</b> Accepts input from the pipeline (process it in a <code>process { }</code> block).</li>
+                        <li><b>[ValidateSet("A","B")] :</b> Only allows listed values and enables tab completion for them.</li>
+                        <li><b>[ValidateRange(1,10)], [ValidatePattern("regex")], [ValidateNotNullOrEmpty()] :</b> Built-in input validation.</li>
+                        <li><b>[switch] :</b> A true/false flag parameter, like <code>-Force</code>.</li>
+                    </ul>
+                    <h6>Splatting -</h6>
+                    <p>Pass parameters as a hashtable with <code>@</code> instead of <code>$</code>. Cleaner than long lines or backticks.</p>
+                    <div class="code-box code-box-color"><code>$params = @{
+    Path        = "C:\Reports"
+    Filter      = "*.pdf"
+    Recurse     = $true
+    ErrorAction = "SilentlyContinue"
+}
+Get-ChildItem @params</code></div>
+                    <h5>Scripts :</h5>
+                    <p>A script is a <code>.ps1</code> file. It can declare a <code>param()</code> block at the top, just like a function.</p>
+                    <div class="code-box code-box-color"><code>.\deploy.ps1 -Environment Prod   # run a script in the current folder (.\ required)
+. .\helpers.ps1                  # dot-source: load its functions/variables into this session
+&amp; "C:\My Scripts\run.ps1"       # call operator for paths with spaces
+pwsh -File .\script.ps1          # run in a new PowerShell process
+pwsh -Command "Get-Date"         # run a one-off command</code></div>
+                    <h5>Modules :</h5>
+                    <p>Modules package reusable cmdlets and functions. They are installed from the PowerShell Gallery and auto-load when one of their commands is first used.</p>
+                    <div class="code-box code-box-color"><code>Find-Module *Azure*                    # search the PowerShell Gallery
+Install-Module Az -Scope CurrentUser   # install without admin rights
+Import-Module Az                       # load explicitly
+Get-Module -ListAvailable              # installed modules
+Update-Module Az
+Get-Command -Module Microsoft.PowerShell.Management</code></div>
+                    <h6>Profile -</h6>
+                    <p>The profile is a script that runs every time PowerShell starts, used for aliases, functions, and prompt customization. Its path is stored in <code>$PROFILE</code>.</p>
+                    <div class="code-box code-box-color"><code>if (!(Test-Path $PROFILE)) { New-Item $PROFILE -Force }
+notepad $PROFILE                 # or: code $PROFILE
+. $PROFILE                       # reload after editing</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="filesystem">
+                <h4 class="heading">File System</h4>
+                <div class="content">
+                    <h6>Navigation &amp; Listing -</h6>
+                    <div class="code-box code-box-color"><code>Get-Location                          # current folder (pwd)
+Set-Location C:\Projects              # change folder (cd)
+Push-Location C:\Temp; Pop-Location   # go somewhere and come back
+Get-ChildItem                         # list items (ls, dir)
+Get-ChildItem -Force                  # include hidden files
+Get-ChildItem -Recurse -Filter *.js   # search recursively
+Get-ChildItem -File | Where-Object Length -gt 100MB   # files over 100 MB</code></div>
+                    <h6>Create, Copy, Move, Delete -</h6>
+                    <div class="code-box code-box-color"><code>New-Item notes.txt                         # create a file (touch)
+New-Item -ItemType Directory -Path logs    # create a folder (mkdir)
+Copy-Item a.txt backup\a.txt               # copy (cp)
+Copy-Item src\ dest\ -Recurse              # copy a folder
+Move-Item old.txt archive\                 # move (mv)
+Rename-Item report.txt report-2026.txt     # rename
+Remove-Item temp\ -Recurse -Force          # delete a folder and its contents (rm -rf)
+Test-Path C:\Logs\app.log                  # True / False
+Join-Path $HOME "Documents"                # build paths safely across OSes</code></div>
+                    <h6>Reading &amp; Writing Files -</h6>
+                    <div class="code-box code-box-color"><code>Get-Content app.log                        # read (cat)
+Get-Content app.log -TotalCount 10         # first 10 lines (head)
+Get-Content app.log -Tail 20 -Wait         # follow a log live (tail -f)
+Set-Content out.txt "Hello"                # write, overwriting
+Add-Content out.txt "More text"            # append
+Get-Content data.json -Raw | ConvertFrom-Json   # read whole file as one string
+Select-String -Path *.log -Pattern "ERROR"      # search inside files (grep)
+Get-FileHash setup.exe -Algorithm SHA256        # checksum</code></div>
+                    <h6>Providers &amp; Drives -</h6>
+                    <p>PowerShell exposes other data stores as drives, so the same cmdlets (<code>Get-ChildItem</code>, <code>Get-Item</code>, <code>Set-Item</code>) work on them.</p>
+                    <ul class="justify">
+                        <li><b>FileSystem :</b> <code>C:</code>, <code>D:</code>, or <code>/</code> on Linux.</li>
+                        <li><b>Env :</b> Environment variables: <code>Get-ChildItem Env:</code>.</li>
+                        <li><b>Registry (Windows) :</b> <code>HKLM:</code> and <code>HKCU:</code>, e.g. <code>Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion</code>.</li>
+                        <li><b>Cert (Windows) :</b> Certificate store: <code>Get-ChildItem Cert:\CurrentUser\My</code>.</li>
+                        <li><b>Variable / Function / Alias :</b> Everything defined in the session.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="system">
+                <h4 class="heading">Processes, Services &amp; System</h4>
+                <div class="content">
+                    <h6>Processes -</h6>
+                    <div class="code-box code-box-color"><code>Get-Process                                # all processes (ps)
+Get-Process chrome | Select-Object Id, CPU, WorkingSet
+Stop-Process -Name notepad                 # kill by name
+Stop-Process -Id 4120 -Force               # kill by ID
+Start-Process notepad.exe
+Start-Process pwsh -Verb RunAs             # start as Administrator (Windows)</code></div>
+                    <h6>Services (Windows) -</h6>
+                    <div class="code-box code-box-color"><code>Get-Service                                # all services
+Get-Service | Where-Object Status -eq Running
+Get-Service wuauserv | Select-Object *     # all properties of one service
+Start-Service Spooler
+Stop-Service Spooler
+Restart-Service Spooler
+Set-Service Spooler -StartupType Disabled</code></div>
+                    <h6>System Information -</h6>
+                    <div class="code-box code-box-color"><code>Get-ComputerInfo                           # OS, hardware, BIOS (Windows)
+Get-CimInstance Win32_OperatingSystem      # OS details via CIM/WMI
+Get-CimInstance Win32_LogicalDisk | Select-Object DeviceID, @{n='FreeGB';e={[math]::Round($_.FreeSpace/1GB)}}
+Get-PSDrive -PSProvider FileSystem         # drives and free space (cross-platform)
+Get-HotFix                                 # installed Windows updates
+Get-LocalUser                              # local user accounts
+Get-WinEvent -LogName System -MaxEvents 20 # recent event log entries
+Get-Date -Format "yyyy-MM-dd HH:mm"        # formatted date
+Restart-Computer -WhatIf</code></div>
+                    <p><code>Get-WmiObject</code> and <code>Get-EventLog</code> are legacy commands not available in PowerShell 7. Use <code>Get-CimInstance</code> and <code>Get-WinEvent</code> instead.</p>
+                </div>
+            </div>
+
+            <div class="sections" id="networking">
+                <h4 class="heading">Networking &amp; Web</h4>
+                <div class="content">
+                    <h6>Network Diagnostics -</h6>
+                    <div class="code-box code-box-color"><code>Test-Connection google.com -Count 2        # ping
+Test-NetConnection google.com -Port 443    # is a TCP port reachable? (Windows)
+Resolve-DnsName example.com -Type MX       # DNS lookup (Windows)
+Get-NetIPAddress -AddressFamily IPv4       # IP addresses (Windows)
+Get-NetTCPConnection -State Listen         # listening ports (Windows)
+Get-NetAdapter                             # network adapters (Windows)</code></div>
+                    <h6>Web Requests &amp; REST APIs -</h6>
+                    <ul class="justify">
+                        <li><b>Invoke-WebRequest (<code>iwr</code>) :</b> Returns the full HTTP response: status code, headers, raw content. Use it to download files or inspect responses.</li>
+                        <li><b>Invoke-RestMethod (<code>irm</code>) :</b> Returns just the body, and automatically converts JSON or XML into PowerShell objects. Best for APIs.</li>
+                    </ul>
+                    <div class="code-box code-box-color"><code># GET: JSON is converted to objects automatically
+$repo = Invoke-RestMethod https://api.github.com/repos/PowerShell/PowerShell
+$repo.stargazers_count
+
+# POST JSON with a header
+$body = @{ title = "Bug report"; priority = 2 } | ConvertTo-Json
+Invoke-RestMethod -Uri https://api.example.com/issues -Method Post `
+    -Body $body -ContentType "application/json" `
+    -Headers @{ Authorization = "Bearer $env:API_TOKEN" }
+
+# Download a file and check the status code
+Invoke-WebRequest https://example.com/file.zip -OutFile file.zip
+(Invoke-WebRequest https://example.com).StatusCode   # 200</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="errors">
+                <h4 class="heading">Error Handling &amp; Streams</h4>
+                <div class="content">
+                    <h6>Types of Errors -</h6>
+                    <ul class="justify">
+                        <li><b>Non-Terminating :</b> The cmdlet reports the error and keeps going, e.g. <code>Get-Item</code> on several paths where one is missing. Most cmdlet errors are this type, and <code>try/catch</code> does <i>not</i> catch them by default.</li>
+                        <li><b>Terminating :</b> Stops execution. Produced by <code>throw</code>, syntax errors, .NET exceptions, or any error when <code>-ErrorAction Stop</code> is used.</li>
+                    </ul>
+                    <h6>Try / Catch / Finally -</h6>
+                    <div class="code-box code-box-color"><code>try {
+    $content = Get-Content C:\missing.txt -ErrorAction Stop   # make it terminating
+}
+catch [System.Management.Automation.ItemNotFoundException] {
+    Write-Warning "File not found"
+}
+catch {
+    Write-Error "Unexpected error: $($_.Exception.Message)"
+}
+finally {
+    Write-Verbose "Always runs, for cleanup"
+}
+
+throw "Config file is invalid"           # raise your own terminating error
+$ErrorActionPreference = 'Stop'          # make every error terminating in this script</code></div>
+                    <h6>Output Streams -</h6>
+                    <p>PowerShell has six output streams, so data and messages never get mixed up. Only the success stream flows into the next command in a pipeline.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Stream</th>
+                                    <th>Write With</th>
+                                    <th>Shown By Default</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>1</td>
+                                    <td>Success (output)</td>
+                                    <td><code>Write-Output</code> or just the value</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Error</td>
+                                    <td><code>Write-Error</code></td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Warning</td>
+                                    <td><code>Write-Warning</code></td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Verbose</td>
+                                    <td><code>Write-Verbose</code></td>
+                                    <td>No (use <code>-Verbose</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Debug</td>
+                                    <td><code>Write-Debug</code></td>
+                                    <td>No (use <code>-Debug</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>Information</td>
+                                    <td><code>Write-Information</code>, <code>Write-Host</code></td>
+                                    <td><code>Write-Host</code> only</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p><b>Write-Output vs Write-Host :</b> <code>Write-Output</code> sends data down the pipeline (it can be captured and processed). <code>Write-Host</code> only displays text on screen, so use it for messages, not results.</p>
+                </div>
+            </div>
+
+            <div class="sections" id="remoting">
+                <h4 class="heading">Remoting &amp; Jobs</h4>
+                <div class="content">
+                    <h5>Remoting :</h5>
+                    <p>PowerShell Remoting runs commands on remote machines. Windows uses WinRM (ports 5985 HTTP / 5986 HTTPS); PowerShell 7 can also use SSH, which works across Windows, Linux, and macOS.</p>
+                    <div class="code-box code-box-color"><code>Enable-PSRemoting -Force                       # enable WinRM on the target (admin)
+
+Enter-PSSession -ComputerName Server01         # interactive remote shell (like SSH)
+Exit-PSSession
+
+Invoke-Command -ComputerName Web01, Web02 -ScriptBlock {
+    Get-Service W3SVC                          # runs on both servers in parallel
+}
+
+$s = New-PSSession -ComputerName Server01      # reusable persistent session
+Invoke-Command -Session $s -ScriptBlock { $env:COMPUTERNAME }
+Copy-Item .\app.zip -Destination C:\Deploy -ToSession $s
+Remove-PSSession $s
+
+Enter-PSSession -HostName user@linux01         # PS 7+: remoting over SSH</code></div>
+                    <h5>Background Jobs :</h5>
+                    <p>Jobs run commands in the background so the console stays usable.</p>
+                    <div class="code-box code-box-color"><code>$job = Start-Job { Get-ChildItem C:\ -Recurse -File | Measure-Object }
+Get-Job                                        # list jobs and their state
+Receive-Job $job -Wait                         # wait and collect the output
+Remove-Job $job
+
+Start-ThreadJob { Invoke-RestMethod https://api.example.com }   # lighter, thread-based (PS 7+)
+Invoke-Command -ComputerName Server01 -ScriptBlock { ... } -AsJob</code></div>
+                </div>
+            </div>
+
+            <div class="sections" id="security">
+                <h4 class="heading">Execution Policy &amp; Security</h4>
+                <div class="content">
+                    <p>The execution policy controls whether PowerShell runs scripts and whether they must be signed. It is a safety feature to prevent accidental script runs, <i>not</i> a security boundary: a user can bypass it, so it does not stop a determined attacker.</p>
+                    <h6>Types of Execution Policies -</h6>
+                    <ul class="justify">
+                        <li><b>Restricted :</b> No scripts can run; interactive commands only. Default on Windows client editions.</li>
+                        <li><b>AllSigned :</b> Only scripts signed by a trusted publisher can run.</li>
+                        <li><b>RemoteSigned :</b> Local scripts run freely; scripts downloaded from the internet must be signed. Default on Windows Server and the most common choice for developers.</li>
+                        <li><b>Unrestricted :</b> All scripts run; warns before running downloaded ones. Default on Linux and macOS, where policies are not enforced.</li>
+                        <li><b>Bypass :</b> Nothing is blocked and there are no warnings. Used by automation tools.</li>
+                    </ul>
+                    <div class="code-box code-box-color"><code>Get-ExecutionPolicy -List                           # policy at every scope
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # no admin needed
+Unblock-File .\downloaded-script.ps1                # remove the "downloaded from internet" mark
+pwsh -ExecutionPolicy Bypass -File .\script.ps1     # one-off override for a single run</code></div>
+                    <h6>Credentials &amp; Secrets -</h6>
+                    <div class="code-box code-box-color"><code>$cred = Get-Credential                          # secure prompt, returns a PSCredential
+Invoke-Command -ComputerName Server01 -Credential $cred -ScriptBlock { whoami }
+$pass = Read-Host "Password" -AsSecureString     # masked input
+
+# Store secrets in a vault instead of in scripts
+Install-Module Microsoft.PowerShell.SecretManagement, Microsoft.PowerShell.SecretStore
+Register-SecretVault -Name Local -ModuleName Microsoft.PowerShell.SecretStore
+Set-Secret -Name ApiKey -Secret "abc123"
+$key = Get-Secret -Name ApiKey -AsPlainText</code></div>
+                    <h6>Security Best Practices -</h6>
+                    <ul class="justify">
+                        <li><b>Never Hard-Code Secrets :</b> Use <code>Get-Credential</code>, SecretManagement, or environment variables.</li>
+                        <li><b>Use -WhatIf First :</b> Preview any bulk delete or change before running it for real.</li>
+                        <li><b>Run with Least Privilege :</b> Only elevate (Run as Administrator) when a task requires it.</li>
+                        <li><b>Review Before Running :</b> Read scripts from the internet before executing them, especially <code>irm ... | iex</code> one-liners, which download and run code immediately.</li>
+                        <li><b>Enable Logging :</b> Script block logging and transcription (<code>Start-Transcript</code>) record what ran, which is essential for security auditing.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sections" id="bash-vs-ps">
+                <h4 class="heading">Bash vs PowerShell</h4>
+                <div class="content">
+                    <p>Common Linux / Bash commands and their PowerShell equivalents. Many Bash names already work in PowerShell on Windows as aliases. On Linux and macOS these aliases are not defined, so names like <code>ls</code> and <code>cat</code> run the native Unix tools instead.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Bash</th>
+                                    <th>PowerShell</th>
+                                    <th>Aliases</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td><code>ls</code></td>
+                                    <td><code>Get-ChildItem</code></td>
+                                    <td><code>ls</code>, <code>dir</code>, <code>gci</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>cd</code></td>
+                                    <td><code>Set-Location</code></td>
+                                    <td><code>cd</code>, <code>sl</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>pwd</code></td>
+                                    <td><code>Get-Location</code></td>
+                                    <td><code>pwd</code>, <code>gl</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>cat</code></td>
+                                    <td><code>Get-Content</code></td>
+                                    <td><code>cat</code>, <code>type</code>, <code>gc</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>cp</code></td>
+                                    <td><code>Copy-Item</code></td>
+                                    <td><code>cp</code>, <code>copy</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>mv</code></td>
+                                    <td><code>Move-Item</code></td>
+                                    <td><code>mv</code>, <code>move</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>rm -rf</code></td>
+                                    <td><code>Remove-Item -Recurse -Force</code></td>
+                                    <td><code>rm</code>, <code>del</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>mkdir</code></td>
+                                    <td><code>New-Item -ItemType Directory</code></td>
+                                    <td><code>mkdir</code>, <code>md</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>touch file</code></td>
+                                    <td><code>New-Item file</code></td>
+                                    <td><code>ni</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>grep</code></td>
+                                    <td><code>Select-String</code></td>
+                                    <td><code>sls</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>echo</code></td>
+                                    <td><code>Write-Output</code></td>
+                                    <td><code>echo</code>, <code>write</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>head -n 5</code></td>
+                                    <td><code>Get-Content -TotalCount 5</code></td>
+                                    <td><code>Select-Object -First 5</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>tail -f</code></td>
+                                    <td><code>Get-Content -Tail 10 -Wait</code></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><code>wc -l</code></td>
+                                    <td><code>Measure-Object -Line</code></td>
+                                    <td><code>measure</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>ps</code></td>
+                                    <td><code>Get-Process</code></td>
+                                    <td><code>ps</code>, <code>gps</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>kill</code></td>
+                                    <td><code>Stop-Process</code></td>
+                                    <td><code>kill</code>, <code>spps</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>which</code></td>
+                                    <td><code>Get-Command</code></td>
+                                    <td><code>gcm</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>man</code></td>
+                                    <td><code>Get-Help</code></td>
+                                    <td><code>help</code>, <code>man</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>history</code></td>
+                                    <td><code>Get-History</code></td>
+                                    <td><code>history</code>, <code>h</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>clear</code></td>
+                                    <td><code>Clear-Host</code></td>
+                                    <td><code>clear</code>, <code>cls</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>curl</code> / <code>wget</code></td>
+                                    <td><code>Invoke-WebRequest</code></td>
+                                    <td><code>iwr</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>export VAR=x</code></td>
+                                    <td><code>$env:VAR = "x"</code></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><code>echo $?</code></td>
+                                    <td><code>$LASTEXITCODE</code> (exit code) or <code>$?</code> (True / False)</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>In Windows PowerShell 5.1, <code>curl</code> and <code>wget</code> were aliases for <code>Invoke-WebRequest</code>. PowerShell 7 removed them, so <code>curl</code> now runs the real curl program.</p>
+                    <h6>Example: Same Task, Different Approach -</h6>
+                    <div class="code-box code-box-color"><code># Bash: parse text columns to find the 3 largest files
+ls -l | sort -k5 -n -r | head -3 | awk '{print $9, $5}'
+
+# PowerShell: work with properties directly
+Get-ChildItem -File | Sort-Object Length -Descending | Select-Object -First 3 Name, Length</code></div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <nav>
+                <a href="/Cheatsheets"><i class="bi bi-arrow-left-square-fill"></i></a>
+                <a href="#" ><i class="bi bi-arrow-up-square-fill"></i></a>
+            </nav>
+        </div>
+
+        <!-- JavaScript -->
+        <script src="../assets/js/script.js"></script>
+    </body>
+</html>
